@@ -170,6 +170,7 @@ class FakePopen:
             self._write_to_buffer(self.__stdout, stdout)
         stderr = kwargs.get("stderr")
         if stderr == subprocess.STDOUT and self.__stderr:
+            assert self.stdout is not None
             self.stdout = self._prepare_buffer(self.__stderr, self.stdout)
         elif stderr == subprocess.PIPE:
             self.stderr = self._prepare_buffer(self.__stderr)
@@ -179,7 +180,7 @@ class FakePopen:
     def _prepare_buffer(
         self,
         input: OPTIONAL_TEXT_OR_ITERABLE,
-        io_base: BUFFER = None,
+        io_base: Optional[BUFFER] = None,
     ) -> Union[io.BytesIO, io.StringIO, asyncio.StreamReader]:
         linesep = self._convert(os.linesep)
 

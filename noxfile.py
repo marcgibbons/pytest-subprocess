@@ -1,16 +1,16 @@
 import nox
 
 
-@nox.session(python=["3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "pypy3"])
+@nox.session(python=["3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "pypy3.8"])
 def tests(session):
     session.install(".[test]")
-    session.run("coverage", "run", "-m", "pytest", "-v")
+    session.run("coverage", "run", "-m", "pytest", "-v", *session.posargs)
 
 
 @nox.session
 def flake8(session):
     session.install("flake8")
-    session.run("flake8", "pytest_subprocess", "tests")
+    session.run("flake8", "pytest_subprocess", "tests", *session.posargs)
 
 
 @nox.session
@@ -21,7 +21,8 @@ def mypy(session):
     session.run("mypy", "tests/test_typing.py", "--config-file=setup.cfg")
 
 
-@nox.session
+# Note sphinx-napoleon uses deprecated renames removed in 3.10
+@nox.session(python="3.9")
 def docs(session):
     session.install(".[docs]")
     session.run("sphinx-build", "-b", "html", "docs", "docs/_build", "-v", "-W")
@@ -29,8 +30,8 @@ def docs(session):
 
 @nox.session
 def create_dist(session):
-    session.install("twine")
-    session.run("python", "setup.py", "sdist", "bdist_wheel")
+    session.install("twine", "build")
+    session.run("python", "-m", "build")
     session.run("twine", "check", "dist/*")
 
 
