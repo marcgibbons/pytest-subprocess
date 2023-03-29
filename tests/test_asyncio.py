@@ -330,6 +330,20 @@ async def test_popen_recorder(fp):
     assert all(isinstance(instance, AsyncFakePopen) for instance in recorder.calls)
 
 
+@pytest.mark.asyncio
+async def test_raises_exceptions_from_callback(fp):
+    class MyException(Exception):
+        pass
+
+    def callback(process):
+        raise MyException()
+
+    fp.register(["test"], callback=callback)
+
+    with pytest.raises(MyException):
+        await asyncio.create_subprocess_shell("test")
+
+
 @pytest.fixture(autouse=True)
 def skip_on_pypy():
     """Async test for some reason crash on pypy 3.6 on Windows"""
